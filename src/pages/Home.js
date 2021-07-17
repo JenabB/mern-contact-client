@@ -18,11 +18,52 @@ const Home = () => {
       .catch((error) => console.log(error.response));
   });
 
+  const sorted = contacts.sort((a, b) => a.name.localeCompare(b.name));
+
+  const groupingLabel = sorted.reduce((r, e) => {
+    let groupLabel = e.name.substr(0, 1).toUpperCase();
+    // Cek jika groupLabel belum terisi
+    if (!r[groupLabel]) r[groupLabel] = { groupLabel, data: [e] };
+    // Cek jika groupLabel sudah terisi, maka push e
+    else r[groupLabel].data.push(e);
+    // Kembalikan array yang hanya berisi groupLabel saja
+    return r;
+  }, {});
+
+  // Tambahkan ke dalam newData
+  let groupedContact = Object.values(groupingLabel);
+
   return (
-    <div>
+    <div className="bg-blue-400">
       <Header />
-      <div className="bg-blue-400 p-4 h-screen">
-        {contacts &&
+      <div className=" p-4 h-full lg:w-3/5 w-full mx-auto">
+        <div className="text-center">
+          <input
+            placeholder="search"
+            className="p-2 text-center rounded-full"
+          />
+        </div>
+        {groupedContact.map((g, i) => (
+          <div>
+            <div className="my-8">
+              <h1 className="bg-white text-blue rounded-full m-2 my-5 inline p-2 px-3">
+                {g.groupLabel}
+              </h1>
+              <div className="mt-4">
+                {g.data.map((dat, i) => (
+                  <Link to={`${dat._id}`}>
+                    <div className="bg-white rounded shadow-lg m-2 p-4" key={i}>
+                      <h1>{dat.name}</h1>
+                      <p>{dat.group}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* {contacts &&
           contacts.map((contact, i) => (
             <Link to={`${contact._id}`}>
               <div className="bg-white rounded shadow-lg m-2 p-4" key={i}>
@@ -37,7 +78,7 @@ const Home = () => {
                 </div>
               </div>
             </Link>
-          ))}
+          ))} */}
       </div>
       <FloatingActionButton />
     </div>
